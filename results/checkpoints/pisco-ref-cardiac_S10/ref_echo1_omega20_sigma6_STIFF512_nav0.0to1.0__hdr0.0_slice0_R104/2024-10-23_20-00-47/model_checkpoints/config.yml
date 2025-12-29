@@ -1,0 +1,103 @@
+batch_size: 10000
+coord_dim: 3
+cycle_duration: 1
+data_root: /home/iml/veronika.spieker/workspace_data/cardiac_cine
+data_type: cardiac_cine
+data_type_ntw: 7
+dataset:
+  acc_factor: 104
+  fe_crop: 1.0
+  fe_oversampling: 1
+  hysteresis: false
+  module: datasets.radialSoS_sorted
+  name: RadialSoSDataset
+  nav_drift: false
+  nav_max: 1.0
+  nav_min: 0.0
+  remove_center: false
+  scale_coils: false
+echo: 0
+encoding:
+  pi_factor: true
+  sigma: 6
+  spat_feat_perc: 0.75
+  type: STIFF
+exp_name: ref_echo1_omega20_sigma6_STIFF512_nav0.0to1.0
+exp_summary: wandb
+fe_steps: 414
+final_shape: 104
+gpu: 0
+group_name: pisco-ref-cardiac
+hdr_eps: 1e-2
+hdr_ff_factor: 0.0
+hdr_ff_sigma: 1
+kreg:
+  alternating: false
+  complex_type: mag_phase
+  loss_norm: L1_dist
+  loss_type: espirit_single
+  mag_comp: false
+  max_sets: 30
+  min_sets: 30
+  mini_batch: 0
+  optim_type: noreg
+  optimizer:
+    name: Adam
+    params:
+      lr: 1e-5
+  overdetermination: 1.1
+  reg_alpha: 0.0001
+  reg_lamda: 0.01
+  reg_type: Tikhonov
+  sort_freqs: true
+  sort_sets: temp
+log: true
+log_test: true
+loss_type: hdr_ff
+model:
+  module: models.siren_sos_kreg
+  name: NIKSiren
+  params:
+    hidden_features: 512
+    num_layers: 4
+    omega_0: 20
+  patch:
+    dist:
+    - 2
+    - 2
+    exclude_center: 5
+    origin: cart
+    size:
+    - 3
+    - 3
+    tconst: true
+    tdelta: 0.0
+    type: cartX
+model_save_path: /home/iml/veronika.spieker/workspace_results/pisco-cardiac/cardiac_cine/pisco-ref-cardiac_S10/ref_echo1_omega20_sigma6_STIFF512_nav0.0to1.0__hdr0.0_slice0_R104/2024-10-23_20-00-47/model_checkpoints
+n_echo: 1
+n_slices: 1
+n_spokes: 50
+nc: 22
+nc_recon: 22
+ne: 1
+nnav: 25
+num_steps: 5000
+num_workers: 0
+nx: 416
+ny: 416
+optimizer:
+  module: Adam
+  params:
+    amsgrad: true
+    lr: 1e-5
+out_dim: 22
+pretrain: false
+random_sample: false
+result_save_path: /home/iml/veronika.spieker/workspace_results/pisco-cardiac/cardiac_cine/pisco-ref-cardiac_S10/ref_echo1_omega20_sigma6_STIFF512_nav0.0to1.0__hdr0.0_slice0_R104/2024-10-23_20-00-47/results
+results_root: /home/iml/veronika.spieker/workspace_results/pisco-cardiac/cardiac_cine
+sample_spoke: true
+slice: 0
+subject_name: 10
+wandb_entity: veronikas
+wandb_project: pisco-cardiac
+weight_path: null

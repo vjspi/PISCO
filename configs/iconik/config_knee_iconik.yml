@@ -1,0 +1,68 @@
+# experiment summary config
+wandb_entity: veronikas
+wandb_project: &wandb_project pisco-knee-multi
+#exp_summary: None
+log_test: True
+exp_summary: wandb
+group_name: &group_name iconik
+exp_name: w20_dim3_lay3
+
+### Data root
+nc_recon: &nc_recon 26
+echo: 0
+
+num_workers: 0
+batch_size: 10000 #30000
+sample_spoke: True
+random_sample: False
+num_steps: 1000
+
+## ACS calibration schedule
+patch_schedule:
+  calib_timing: jump
+  calib_region: 0.4
+  freeze_epoch: 1000
+  finetune_layers: 2
+
+# encoding
+encoding:
+  type: STIFF
+  sigma: 1
+  spat_feat_perc: 0.75
+  pi_factor: True
+
+## Models
+model:
+  module: models.siren_sos_iconik
+  name: NIKSirenPatch
+  params:
+    num_layers: 4
+    hidden_features: 512
+    omega_0: 20
+    patch_dim: 3
+    patch_dist: 1
+    patch_layers: 3
+    patch_bias: False
+    mask_center: True
+    dual_loss: False
+    relu: True
+  pretrained:
+    pretrain_group: pisco-ref-knee
+    pretrain_exp: ref_echo1
+    epoch: 4999 # lossreg0.1 # 200 #
+coord_dim: 3
+out_dim: *nc_recon
+scale: 10
+
+# loss config
+loss_type: hdr_ff #weighted_l1 #weighted_l1
+hdr_eps: 1e-2
+hdr_ff_sigma: 1
+hdr_ff_factor: 0.0
+
+# recon config
+#nrecon: [*nc_recon, 300, 300, 5]
+nc: *nc_recon
+nx: 300
+ny: 300
+nnav: 5

@@ -1,0 +1,37 @@
+## Data root
+data_type: &data_type abdominal_sos
+data_root: !join [workspace_data/]
+results_root: !join [workspace_results/]
+
+# recon config
+nx: 268
+ny: 268
+final_shape: 268
+nnav: 50
+cycle_duration: 5
+coord_dim: 3 # and for second network +1 (t)
+
+## Training
+optimizer:
+  module: Adam
+  params:
+    lr: 1e-5
+    amsgrad: True
+#    weight_decay: 1e-2
+
+## Dataloader
+dataset:
+  module: datasets.radialSoS_sorted
+  name: RadialSoSDataset
+  nav_min: 0
+  nav_max: 0.5
+  nav_drift: True
+  fe_crop: 1       # crop the FE range (resolution is decreased)
+  fe_oversampling: 1 # if >1, removes the fe_oversampling
+  acc_factor: 1     # cut spokes
+  scale_coils: False
+  remove_center: True
+num_workers: 0
+batch_size: 10000 #30000
+sample_spoke: True
+random_sample: False

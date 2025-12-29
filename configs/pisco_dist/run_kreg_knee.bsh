@@ -1,0 +1,48 @@
+#!/bin/bash
+
+source ~/anaconda3/etc/profile.d/conda.sh
+
+conda init bash
+conda activate nik_mri_clean2
+gpu=2
+
+subjects=(
+  "knee"
+)
+slices=(
+"10"
+#"20"
+#"15"
+#"30"
+)
+r=(
+#1
+#2
+#5
+#10
+20
+)
+experiments=(
+  "configs/pisco_dist/exp_config_kreg_knee.yml"
+  )
+
+## switch into project directoryscreen -
+echo $PATH
+cd ~/workspace/AbdoNIK/
+pwd
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+
+# Run training for all given experiments
+for exp in "${experiments[@]}"; do
+  for sub in "${subjects[@]}"; do
+    for slice in "${slices[@]}"; do
+      for r in "${r[@]}"; do
+        python3 train_pisco.py -c "$exp" -sub "$sub" -s "$slice" -r "$r" -g "$gpu" -a 1e-4 -l 0.05 -od 1.1 &
+      done
+      wait
+    done
+    wait
+  done
+  wait
+done

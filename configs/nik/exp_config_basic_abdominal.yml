@@ -1,0 +1,70 @@
+# experiment summary config
+wandb_entity: veronikas
+wandb_project: &wandb_project pisco-abd
+#exp_summary: None
+log_test: True
+exp_summary: wandb
+group_name: pisco-ref-abd
+exp_name: ref_echo1
+
+### Data root
+echo: 0
+
+num_workers: 0
+batch_size: 10000 #30000
+sample_spoke: True
+random_sample: False
+num_steps: 5000
+
+## NIK Model Training
+pretrain: False
+
+# encoding
+encoding:
+  type: STIFF
+  sigma: 6
+  spat_feat_perc: 0.75
+  pi_factor: True
+
+## Models
+# model config for mlp - kdata
+model:
+  module: models.siren_sos_kreg
+  name: NIKSiren
+  params:
+    num_layers: 4
+    hidden_features: 512
+    omega_0: 20
+  patch:
+    origin: cart # cart or radial (radial takes the points from NIK training)
+    type: cartXY # cart_fixedt # radial_full # radial_half
+    dist: [2,2]   # x,y for cart | fe,pe for radial
+    size: [3,3]   # x,y for cart | fe,pe for radial
+    exclude_center: 5 # 5*delta_x
+    tconst: True
+    tdelta: 0.0
+
+coord_dim: 3
+loss_type: hdr_ff # hdr_ff #weighted_l1 #weighted_l1
+hdr_eps: 1e-2
+hdr_ff_sigma: 1
+hdr_ff_factor: 0.0
+kreg:
+  optimizer:
+    name: Adam
+    params:
+      lr: 1e-5
+      amsgrad: True
+  mini_batch: 0
+  optim_type: "noreg" # "joint_noBack" # "joint_backT" # "joint_noBack"
+  reg_lamda: 0.01
+  loss_norm: L1_dist
+  loss_type: residual # shift_mean # shift_median # var
+  complex_type: mag_phase   # for losses computed on mag this needs to be mag_phase, otherwise loss computed on real
+  overdetermination: 1.1
+  reg_type: Tikhonov
+  reg_alpha: 1e-4
+  max_sets: 30
+  min_sets: 10
+  sort_sets: temp
+  sort_freqs: True

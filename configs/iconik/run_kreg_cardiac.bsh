@@ -1,0 +1,43 @@
+#!/bin/bash
+
+source ~/anaconda3/etc/profile.d/conda.sh
+
+conda init bash
+conda activate nik_mri_clean2
+
+echo 'Starting Script'
+
+slices=(
+"0"
+)
+
+accfactors=(
+"104"
+)
+
+subjects=("cardiac1" "cardiac2" "cardiac3" "cardiac4" "cardiac5" "cardiac6" "cardiac7" "cardiac8" "cardiac9" "cardiac10"
+    "cardiac11" "cardiac12" "cardiac13" "cardiac14" "cardiac15" "cardiac16" "cardiac17" "cardiac18" "cardiac19" "cardiac20"
+    "cardiac21" "cardiac22" "cardiac23" "cardiac24" "cardiac25" "cardiac26" "cardiac27" "cardiac28" "cardiac29" "cardiac30")
+exp="configs/iconik/config_cardiac_iconik.yml"
+
+export exp  # Export variables for parallel to use
+## switch into project directory
+echo $PATH
+cd ~/workspace/AbdoNIK/
+pwd
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+# Define a function that runs the python command
+run_experiment() {
+  local sub="$1"
+  local slice="$2"
+  local r="$3"
+  python3 train_iconik.py -c "$exp" -sub "$sub" -s "$slice" -r "$r" -lr 3e-5
+}
+
+export -f run_experiment  # Export the function for parallel to use
+
+# Use GNU parallel to run jobs in parallel
+parallel -j 1 run_experiment ::: "${subjects[@]}" ::: "${slices[@]}" ::: "${accfactors[@]}"
+
+echo 'finished'

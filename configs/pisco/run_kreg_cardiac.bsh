@@ -1,0 +1,40 @@
+#!/bin/bash
+
+source ~/anaconda3/etc/profile.d/conda.sh
+
+conda init bash
+conda activate nik_mri_clean2
+gpu=0
+epochs=5000
+
+echo 'Starting Script'
+
+slices=(
+"0"
+)
+
+accfactors=(
+"104"
+)
+
+#subjects=("cardiac21" "cardiac22" "cardiac23" "cardiac24" "cardiac25" "cardiac26" "cardiac27" "cardiac28" "cardiac29" "cardiac30")
+subjects=("cardiac10")
+exp="configs/pisco/exp_config_kreg_cardiac.yml"
+
+export exp  # Export variables for parallel to use
+
+# Define a function that runs the python command
+run_experiment() {
+  local sub="$1"
+  local slice="$2"
+  local r="$3"
+  python3 train_pisco.py -c "$exp" -sub "$sub" -s "$slice" -r "$r" -a 0.0001 -od 1.1 -l 0.15
+}
+
+export -f run_experiment  # Export the function for parallel to use
+
+# Use GNU parallel to run jobs in parallel
+parallel -j 3 run_experiment ::: "${subjects[@]}" ::: "${slices[@]}" ::: "${accfactors[@]}"
+
+
+echo 'finished'

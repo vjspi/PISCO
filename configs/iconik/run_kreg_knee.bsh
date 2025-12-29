@@ -1,0 +1,48 @@
+#!/bin/bash
+
+source ~/anaconda3/etc/profile.d/conda.sh
+
+conda init bash
+conda activate nik_mri_clean2
+gpu=2
+
+r=(
+20
+)
+subjects=(
+  "11_knee"
+)
+slices=(
+#"0"
+"10"
+#"15"
+"20"
+#"30"
+)
+
+experiments=(
+  "configs/iconik/config_knee_iconik.yml"
+  )
+
+
+## switch into project directory
+echo $PATH
+cd ~/workspace/AbdoNIK/
+pwd
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+
+# Run training for all given experiments
+for exp in "${experiments[@]}"; do
+  for sub in "${subjects[@]}"; do
+    for slice in "${slices[@]}"; do
+      for r in "${r[@]}"; do
+        python3 train_iconik.py -c "$exp" -sub "$sub" -s "$slice" -r "$r" -g "$gpu" -om 20 -lr 3e-5 &
+#        wait
+        done
+#      wait
+    done
+#    wait
+  done
+  wait
+done

@@ -1,0 +1,76 @@
+# experiment summary config
+wandb_entity: veronikas
+wandb_project: &wandb_project pisco-knee-multi
+#exp_summary: None
+log_test: True
+exp_summary: wandb
+group_name: &group_name pisco-kreg-L1dist
+exp_name: sepZGT_NOminibatch_20MIN_20max_l1dist_l1_ExclC5_cartXY3_dist2_1kPre_temp
+
+### Data root
+echo: 0
+
+num_workers: 0
+batch_size: 10000 #30000
+sample_spoke: True
+random_sample: False
+num_steps: 5000
+
+## NIK Model Training
+pretrain: False
+
+# encoding
+encoding:
+  type: STIFF
+  sigma: 10
+  spat_feat_perc: 0.75
+  pi_factor: True
+
+## Models
+# model config for mlp - kdata
+model:
+  module: models.siren_sos_kreg
+  name: NIKSiren
+  params:
+    num_layers: 4
+    hidden_features: 512
+    omega_0: 20
+  patch:
+    origin: cart # cart or radial (radial takes the points from NIK training)
+    type: cartXY # cart_fixedt # radial_full # radial_half
+    dist: [2,2]   # x,y for cart | fe,pe for radial
+    size: [3,3]   # x,y for cart | fe,pe for radial
+    exclude_center: 5 # 5*delta_x
+    tconst: True
+    tdelta: 0.0
+  pretrained:
+    pretrain_group: pisco-ref-knee
+    pretrain_exp: ref_echo1
+    epoch: 1000
+
+# loss config
+loss_type: hdr_ff
+hdr_eps: 1e-2
+hdr_ff_sigma: 1
+hdr_ff_factor: 0.0
+kreg:
+  optimizer:
+    name: Adam
+    params:
+      lr: 1e-5
+      amsgrad: True
+  mini_batch: 0
+  optim_type: "separate_backT_ZG"
+  reg_lamda: 0.01
+  loss_norm: L1_dist
+  loss_type: L1_dist
+  complex_type: mag_phase   # for losses computed on mag this needs to be mag_phase, otherwise loss computed on real
+  overdetermination: 1.1
+  reg_type: Tikhonov
+  reg_alpha: 1e-4
+  max_sets: 20
+  min_sets: 20
+  mag_comp: False
+  sort_sets: temp
+  sort_freqs: True
+  alternating: False
